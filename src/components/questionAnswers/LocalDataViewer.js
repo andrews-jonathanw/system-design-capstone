@@ -1,13 +1,19 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 
 const LocalDataViewer = () => {
+  const [data, setData] = useState(['dummy']);
 
-  console.log(process.env.REACT_APP_PORT);
+  useEffect(() => {
+    fetchData();
+  },[])
+
+
   const fetchData = () => {
     axios.get(`http://localhost:${process.env.REACT_APP_PORT}/test`)
-      .then(()=> {
-        console.log('successy boiiii')
+      .then((res)=> {
+        // console.log('successy boiiii', res.data);
+        setData(res.data);
       })
       .catch(err => {
         console.log(err);
@@ -16,7 +22,7 @@ const LocalDataViewer = () => {
     return (
       <div>
         <p>local data stuffs</p>
-        {fetchData()}
+        {console.log(data[0])}
       </div>
     );
 }
