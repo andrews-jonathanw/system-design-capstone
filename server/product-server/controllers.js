@@ -1,21 +1,25 @@
 const express = require('express');
+const db = require('../db');
 
 const productRouter = express.Router();
 
-productRouter.get('/', () => {
-  console.log('Do some queries for getting all the products');
+productRouter.get('/', (req, res) => {
+  // add functionality to account for headers on count and page
+  db.query(`SELECT * FROM product WHERE ...`);
+  // respond w data - transformed to how front end needs it
 });
 
-productRouter.get('/:product_id', () => {
-  console.log('Do a query for getting info for specific product id');
+productRouter.get('/:product_id', (req, res) => {
+  // return product w specific id
+  db.query(`SELECT * FROM product WHERE product_id = ${req.params.product_id}`);
+  // respond w data - transformed to how front end needs it
 });
 
-productRouter.get('/:product_id/styles', () => {
-  console.log('Do a query for getting styles for specific product id');
-});
-
-productRouter.get('/:product_id/related', () => {
-  console.log('Do a query for getting related product id\'s for a product');
+productRouter.get('/:product_id/styles', (req, res) => {
+  // return all styles from id
+  db.query(`SELECT * FROM styles WHERE product_id = ${req.params.product_id}`);
+  // also need photos and skus
+  // respond w data - transformed to how front end needs it
 });
 
 module.exports = productRouter;
