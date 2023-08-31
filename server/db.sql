@@ -10,45 +10,59 @@
 --
 -- ---
 
-DROP TABLE IF EXISTS product;
+  DROP TABLE IF EXISTS product, features, styles, photos, skus CASCADE;
 
-CREATE TABLE product (
-  id SERIAL,
-  name TEXT NOT NULL,
-  slogan TEXT NOT NULL,
-  description TEXT NOT NULL,
-  category TEXT NOT NULL,
-  price INTEGER NOT NULL,
-  PRIMARY KEY (id)
-);
+  CREATE TABLE product (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR,
+    slogan VARCHAR,
+    description VARCHAR,
+    category VARCHAR,
+    default_price INT
+  );
 
--- ---
--- Table 'Product Information'
---
--- ---
+  CREATE TABLE features (
+    id INT PRIMARY KEY,
+    product_id INTEGER NOT NULL,
+    feature VARCHAR,
+    value VARCHAR
+  );
 
-DROP TABLE IF EXISTS Product_Information;
+   CREATE TABLE styles (
+    id INT PRIMARY KEY,
+    product_id INTEGER NOT NULL,
+    name VARCHAR,
+    sale_price VARCHAR,
+    original_price INT,
+    default_style VARCHAR
+   );
 
-CREATE TABLE Product_Information (
-  id SERIAL,
-  Features TEXT NOT NULL,
-  value TEXT NOT NULL,
-  PRIMARY KEY (id)
-);
+  CREATE TABLE photos (
+    id INT PRIMARY KEY,
+    style_id INT NOT NULL,
+    url VARCHAR,
+    thumbnail_url VARCHAR
+  );
 
+  CREATE TABLE skus (
+    id INT PRIMARY KEY,
+    style_id INT NOT NULL,
+    size VARCHAR,
+    quantity INT
+  );
 
 -- ---
 -- Table 'reviews'
 --
 -- ---
 
-DROP TABLE IF EXISTS reviews;
+DROP TABLE IF EXISTS reviews CASCADE;
 
 CREATE TABLE reviews (
   id SERIAL,
   product_id INTEGER NOT NULL,
   rating INTEGER NOT NULL,
-  date INT NOT NULL,
+  date BIGINT NOT NULL,
   summary TEXT NOT NULL,
   body TEXT NOT NULL,
   recommend BOOLEAN NOT NULL,
@@ -65,13 +79,13 @@ CREATE TABLE reviews (
 --
 -- ---
 
-DROP TABLE IF EXISTS question;
+DROP TABLE IF EXISTS question CASCADE;
 
 CREATE TABLE question (
   id SERIAL,
   product_id INTEGER NOT NULL,
   body TEXT NOT NULL,
-  date_written DATE NOT NULL,
+  date_written BIGINT NOT NULL,
   asker_name TEXT NOT NULL,
   asker_email TEXT NOT NULL,
   reported BOOLEAN NOT NULL,
@@ -84,13 +98,13 @@ CREATE TABLE question (
 --
 -- ---
 
-DROP TABLE IF EXISTS answer;
+DROP TABLE IF EXISTS answer CASCADE;
 
 CREATE TABLE answer (
   id SERIAL,
   id_question INTEGER NOT NULL,
   body TEXT NOT NULL,
-  date_written DATE NOT NULL,
+  date_written BIGINT NOT NULL,
   answerer_name TEXT NOT NULL,
   answerer_email TEXT NOT NULL,
   reported BOOLEAN NOT NULL,
@@ -103,7 +117,7 @@ CREATE TABLE answer (
 --
 -- ---
 
-DROP TABLE IF EXISTS archived_answers;
+DROP TABLE IF EXISTS archived_answers CASCADE;
 
 CREATE TABLE archived_answers (
   id_answer INTEGER NOT NULL,
@@ -116,11 +130,11 @@ CREATE TABLE archived_answers (
 --
 -- ---
 
-DROP TABLE IF EXISTS archived_questions;
+DROP TABLE IF EXISTS archived_questions CASCADE;
 
 CREATE TABLE archived_questions (
-  id_question INTEGER NOT NULL,
   id SERIAL,
+  id_question INTEGER NOT NULL,
   PRIMARY KEY (id)
 );
 
@@ -129,7 +143,7 @@ CREATE TABLE archived_questions (
 --
 -- ---
 
-DROP TABLE IF EXISTS answer_photos;
+DROP TABLE IF EXISTS answer_photos CASCADE;
 
 CREATE TABLE answer_photos (
   id SERIAL,
@@ -139,73 +153,11 @@ CREATE TABLE answer_photos (
 );
 
 -- ---
--- Table 'Style'
---
--- ---
-
-DROP TABLE IF EXISTS Style;
-
-CREATE TABLE Style (
-  id SERIAL,
-  id_Product_Styles INTEGER NOT NULL,
-  name TEXT NOT NULL,
-  original_price INTEGER NOT NULL,
-  sale_price INTEGER NOT NULL,
-  style BOOLEAN NOT NULL,
-  PRIMARY KEY (id)
-);
-
--- ---
--- Table 'Product-Styles'
---
--- ---
-
-DROP TABLE IF EXISTS Product_Styles;
-
-CREATE TABLE Product_Styles (
-  id SERIAL,
-  product_id INTEGER NOT NULL,
-  PRIMARY KEY (id)
-);
-
----
--- Table 'Style-Photos'
---
--- ---
-
-DROP TABLE IF EXISTS Style_Photos;
-
-CREATE TABLE Style_Photos (
-  id SERIAL,
-  id_Style INTEGER NOT NULL,
-  thumbnail_url TEXT NOT NULL,
-  url TEXT NOT NULL,
-  PRIMARY KEY (id)
-);
-
--- ---
--- Table 'SKUs'
---
--- ---
-
-DROP TABLE IF EXISTS SKUs;
-
-CREATE TABLE SKUs (
-  id SERIAL,
-  id_Style INTEGER NOT NULL,
-  quantity INTEGER NOT NULL,
-  size TEXT NOT NULL,
-  PRIMARY KEY (id)
-);
-
-
-
--- ---
 -- Table 'Review-Photos'
 --
 -- ---
 
-DROP TABLE IF EXISTS review_photos;
+DROP TABLE IF EXISTS review_photos CASCADE;
 
 CREATE TABLE review_photos (
   id SERIAL,
@@ -219,7 +171,7 @@ CREATE TABLE review_photos (
 --
 -- ---
 
-DROP TABLE IF EXISTS archived_reviews;
+DROP TABLE IF EXISTS archived_reviews CASCADE;
 
 CREATE TABLE archived_reviews(
   id SERIAL,
@@ -232,11 +184,11 @@ CREATE TABLE archived_reviews(
 --
 -- ---
 
-DROP TABLE IF EXISTS reviews_meta_data;
+DROP TABLE IF EXISTS reviews_meta_data CASCADE;
 
 CREATE TABLE reviews_meta_data (
-  product_id INTEGER NULL,
   id SERIAL,
+  product_id INTEGER NULL,
   PRIMARY KEY (id)
 );
 
@@ -246,7 +198,7 @@ CREATE TABLE reviews_meta_data (
 --
 -- ---
 
-DROP TABLE IF EXISTS ratings;
+DROP TABLE IF EXISTS ratings CASCADE;
 
 CREATE TABLE ratings (
   id SERIAL,
@@ -264,7 +216,7 @@ CREATE TABLE ratings (
 --
 -- ---
 
-DROP TABLE IF EXISTS recommended_meta;
+DROP TABLE IF EXISTS recommended_meta CASCADE;
 
 CREATE TABLE recommended_meta (
   id SERIAL,
@@ -279,11 +231,11 @@ CREATE TABLE recommended_meta (
 --
 -- ---
 
-DROP TABLE IF EXISTS characteristics;
+DROP TABLE IF EXISTS characteristics CASCADE;
 
 CREATE TABLE characteristics (
   id SERIAL,
-  product_id INTEGER NULL,
+  product_id INTEGER NOT NULL,
   name TEXT NOT NULL,
   PRIMARY KEY (id)
 );
@@ -293,40 +245,26 @@ CREATE TABLE characteristics (
 --
 -- ---
 
-DROP TABLE IF EXISTS characteristic_rating;
+DROP TABLE IF EXISTS characteristic_rating CASCADE;
 
 CREATE TABLE characteristic_rating (
   id SERIAL,
-  id_characteristics INTEGER NULL,
-  id_reviews INTEGER NULL,
+  id_characteristics INTEGER NOT NULL,
+  id_reviews INTEGER NOT NULL,
   value INTEGER NOT NULL,
   PRIMARY KEY (id)
 );
-
 
 -- ---
 -- Foreign Keys
 -- ---
 
-
-
-
-
-
-
-
-
-ALTER TABLE Product_Information ADD FOREIGN KEY (id) REFERENCES product (id);
 ALTER TABLE reviews ADD FOREIGN KEY (product_id) REFERENCES product (id);
 ALTER TABLE question ADD FOREIGN KEY (product_id) REFERENCES product (id);
 ALTER TABLE answer ADD FOREIGN KEY (id_question) REFERENCES question (id);
 ALTER TABLE archived_answers ADD FOREIGN KEY (id_answer) REFERENCES answer (id);
 ALTER TABLE archived_questions ADD FOREIGN KEY (id_question) REFERENCES question (id);
 ALTER TABLE answer_photos ADD FOREIGN KEY (id_answer) REFERENCES answer (id);
-ALTER TABLE Style ADD FOREIGN KEY (id_Product_Styles) REFERENCES Product_Styles (id);
-ALTER TABLE Product_Styles ADD FOREIGN KEY (product_id) REFERENCES product (id);
-ALTER TABLE Style_Photos ADD FOREIGN KEY (id_Style) REFERENCES Style (id);
-ALTER TABLE SKUs ADD FOREIGN KEY (id_Style) REFERENCES Style (id);
 ALTER TABLE review_photos ADD FOREIGN KEY (id_reviews) REFERENCES reviews (id);
 ALTER TABLE reviews_meta_data ADD FOREIGN KEY (product_id) REFERENCES product (id);
 ALTER TABLE ratings ADD FOREIGN KEY (id_reviews_meta_data) REFERENCES reviews_meta_data (id);
@@ -334,10 +272,27 @@ ALTER TABLE recommended_meta ADD FOREIGN KEY (id_reviews_meta_data) REFERENCES r
 ALTER TABLE characteristics ADD FOREIGN KEY (product_id) REFERENCES product (id);
 ALTER TABLE characteristic_rating ADD FOREIGN KEY (id_characteristics) REFERENCES characteristics (id);
 ALTER TABLE characteristic_rating ADD FOREIGN KEY (id_reviews) REFERENCES reviews (id);
+ALTER TABLE features ADD FOREIGN KEY (product_id) REFERENCES product (id);
+ALTER TABLE styles ADD FOREIGN KEY (product_id) REFERENCES product (id);
+ALTER TABLE photos ADD FOREIGN KEY (style_id) REFERENCES styles (id);
+ALTER TABLE skus ADD FOREIGN KEY (style_id) REFERENCES styles (id);
 
+-- ---
+-- Copy and Load
+-- ---
 
-
-
+\COPY product FROM 'server/csv-data/product.csv' DELIMITER ',' CSV HEADER;
+\COPY reviews FROM 'server/csv-data/reviews.csv' DELIMITER ',' CSV HEADER;
+\COPY features FROM 'server/csv-data/features.csv' DELIMITER ',' CSV HEADER;
+\COPY styles FROM 'server/csv-data/styles.csv' DELIMITER ',' CSV HEADER;
+\COPY question FROM 'server/csv-data/questions.csv' DELIMITER ',' CSV HEADER;
+\COPY characteristics FROM 'server/csv-data/characteristics.csv' DELIMITER ',' CSV HEADER;
+\COPY characteristic_rating FROM 'server/csv-data/characteristic_reviews.csv' DELIMITER ',' CSV HEADER;
+\COPY answer FROM 'server/csv-data/answers.csv' DELIMITER ',' CSV HEADER;
+\COPY answer_photos FROM 'server/csv-data/answers_photos.csv' DELIMITER ',' CSV HEADER;
+\COPY review_photos FROM 'server/csv-data/reviews_photos.csv' DELIMITER ',' CSV HEADER;
+\COPY photos FROM 'server/csv-data/photos.csv' DELIMITER ',' CSV HEADER;
+\COPY skus FROM 'server/csv-data/skus.csv' DELIMITER ',' CSV HEADER;
 
 -- ---
 -- Table Properties
