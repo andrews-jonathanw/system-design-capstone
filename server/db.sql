@@ -10,32 +10,53 @@
 --
 -- ---
 
-DROP TABLE IF EXISTS product;
+  DROP DATABASE IF EXISTS sdc;
+  CREATE DATABASE sdc;
 
-CREATE TABLE product (
-  id SERIAL,
-  name TEXT NOT NULL,
-  slogan TEXT NOT NULL,
-  description TEXT NOT NULL,
-  category TEXT NOT NULL,
-  price INTEGER NOT NULL,
-  PRIMARY KEY (id)
-);
+  CREATE TABLE product (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR,
+    slogan VARCHAR,
+    description VARCHAR,
+    category VARCHAR,
+    default_price INT
+  );
 
--- ---
--- Table 'Product Information'
---
--- ---
+  CREATE TABLE features (
+    id INT PRIMARY KEY,
+    product_id INT REFERENCES product (id),
+    feature VARCHAR,
+    value VARCHAR
+  );
 
-DROP TABLE IF EXISTS Product_Information;
+   CREATE TABLE styles (
+    id INT PRIMARY KEY,
+    product_id INT REFERENCES product (id),
+    name VARCHAR,
+    sale_price INT,
+    original_price INT,
+    default_style VARCHAR
+   );
 
-CREATE TABLE Product_Information (
-  id SERIAL,
-  Features TEXT NOT NULL,
-  value TEXT NOT NULL,
-  PRIMARY KEY (id)
-);
+  CREATE TABLE photos (
+    id INT PRIMARY KEY,
+    style_id INT REFERENCES styles (id),
+    url VARCHAR,
+    thumbnail_url VARCHAR
+  );
 
+  CREATE TABLE skus (
+    id INT PRIMARY KEY,
+    style_id INT REFERENCES styles (id),
+    size VARCHAR,
+    qu;antity INT
+  );
+
+  CREATE TABLE related (
+    id INT PRIMARY KEY,
+    current_product_id INT REFERENCES product (id),
+    related_product_id INT REFERENCES product (id)
+  );
 
 -- ---
 -- Table 'reviews'
@@ -119,8 +140,8 @@ CREATE TABLE archived_answers (
 DROP TABLE IF EXISTS archived_questions;
 
 CREATE TABLE archived_questions (
-  id_question INTEGER NOT NULL,
   id SERIAL,
+  id_question INTEGER NOT NULL,
   PRIMARY KEY (id)
 );
 
@@ -137,68 +158,6 @@ CREATE TABLE answer_photos (
   url TEXT NOT NULL,
   PRIMARY KEY (id)
 );
-
--- ---
--- Table 'Style'
---
--- ---
-
-DROP TABLE IF EXISTS Style;
-
-CREATE TABLE Style (
-  id SERIAL,
-  id_Product_Styles INTEGER NOT NULL,
-  name TEXT NOT NULL,
-  original_price INTEGER NOT NULL,
-  sale_price INTEGER NOT NULL,
-  style BOOLEAN NOT NULL,
-  PRIMARY KEY (id)
-);
-
--- ---
--- Table 'Product-Styles'
---
--- ---
-
-DROP TABLE IF EXISTS Product_Styles;
-
-CREATE TABLE Product_Styles (
-  id SERIAL,
-  product_id INTEGER NOT NULL,
-  PRIMARY KEY (id)
-);
-
----
--- Table 'Style-Photos'
---
--- ---
-
-DROP TABLE IF EXISTS Style_Photos;
-
-CREATE TABLE Style_Photos (
-  id SERIAL,
-  id_Style INTEGER NOT NULL,
-  thumbnail_url TEXT NOT NULL,
-  url TEXT NOT NULL,
-  PRIMARY KEY (id)
-);
-
--- ---
--- Table 'SKUs'
---
--- ---
-
-DROP TABLE IF EXISTS SKUs;
-
-CREATE TABLE SKUs (
-  id SERIAL,
-  id_Style INTEGER NOT NULL,
-  quantity INTEGER NOT NULL,
-  size TEXT NOT NULL,
-  PRIMARY KEY (id)
-);
-
-
 
 -- ---
 -- Table 'Review-Photos'
@@ -235,8 +194,8 @@ CREATE TABLE archived_reviews(
 DROP TABLE IF EXISTS reviews_meta_data;
 
 CREATE TABLE reviews_meta_data (
-  product_id INTEGER NULL,
   id SERIAL,
+  product_id INTEGER NULL,
   PRIMARY KEY (id)
 );
 
@@ -303,30 +262,16 @@ CREATE TABLE characteristic_rating (
   PRIMARY KEY (id)
 );
 
-
 -- ---
 -- Foreign Keys
 -- ---
 
-
-
-
-
-
-
-
-
-ALTER TABLE Product_Information ADD FOREIGN KEY (id) REFERENCES product (id);
 ALTER TABLE reviews ADD FOREIGN KEY (product_id) REFERENCES product (id);
 ALTER TABLE question ADD FOREIGN KEY (product_id) REFERENCES product (id);
 ALTER TABLE answer ADD FOREIGN KEY (id_question) REFERENCES question (id);
 ALTER TABLE archived_answers ADD FOREIGN KEY (id_answer) REFERENCES answer (id);
 ALTER TABLE archived_questions ADD FOREIGN KEY (id_question) REFERENCES question (id);
 ALTER TABLE answer_photos ADD FOREIGN KEY (id_answer) REFERENCES answer (id);
-ALTER TABLE Style ADD FOREIGN KEY (id_Product_Styles) REFERENCES Product_Styles (id);
-ALTER TABLE Product_Styles ADD FOREIGN KEY (product_id) REFERENCES product (id);
-ALTER TABLE Style_Photos ADD FOREIGN KEY (id_Style) REFERENCES Style (id);
-ALTER TABLE SKUs ADD FOREIGN KEY (id_Style) REFERENCES Style (id);
 ALTER TABLE review_photos ADD FOREIGN KEY (id_reviews) REFERENCES reviews (id);
 ALTER TABLE reviews_meta_data ADD FOREIGN KEY (product_id) REFERENCES product (id);
 ALTER TABLE ratings ADD FOREIGN KEY (id_reviews_meta_data) REFERENCES reviews_meta_data (id);
@@ -334,10 +279,6 @@ ALTER TABLE recommended_meta ADD FOREIGN KEY (id_reviews_meta_data) REFERENCES r
 ALTER TABLE characteristics ADD FOREIGN KEY (product_id) REFERENCES product (id);
 ALTER TABLE characteristic_rating ADD FOREIGN KEY (id_characteristics) REFERENCES characteristics (id);
 ALTER TABLE characteristic_rating ADD FOREIGN KEY (id_reviews) REFERENCES reviews (id);
-
-
-
-
 
 -- ---
 -- Table Properties

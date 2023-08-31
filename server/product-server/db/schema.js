@@ -42,4 +42,11 @@ module.exports = {
       size VARCHAR,
       quantity INT
   );`,
+
+  relatedEntity:
+  `CREATE TABLE skus (
+      id INT PRIMARY KEY,
+      current_product_id INT REFERENCES products (id),
+      related_product_id INT REFERENCES products (id)
+  );`,
 }

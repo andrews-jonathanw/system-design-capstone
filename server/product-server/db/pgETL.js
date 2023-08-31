@@ -5,6 +5,7 @@ const schema = require('./schema');
 const csvFiles = [
   'products',
   'features',
+  'related',
   'styles',
   'photos',
   'skus'
