@@ -294,7 +294,10 @@ ALTER TABLE skus ADD FOREIGN KEY (style_id) REFERENCES styles (id);
 \COPY photos FROM 'server/csv-data/photos.csv' DELIMITER ',' CSV HEADER;
 \COPY skus FROM 'server/csv-data/skus.csv' DELIMITER ',' CSV HEADER;
 
--- ---
+alter table question alter column date_written type timestamp using TIMEZONE('UTC', TO_TIMESTAMP(date_written / 1000 ));
+alter table answer alter column date_written type timestamp using TIMEZONE('UTC', TO_TIMESTAMP(date_written / 1000 ));
+alter table reviews alter column date type timestamp using TIMEZONE('UTC', TO_TIMESTAMP(date / 1000 ));
+
 -- Table Properties
 -- ---
 
