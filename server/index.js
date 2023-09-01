@@ -10,6 +10,8 @@ app.use(express.json());
 app.use(bodyParser.json());
 
 app.use('/products', productRouter);
+// app.use('/qa', qaRouter);
+// app.use('/reviews', reviewsRouter);
 
 app.use('/qa', qaRouter);
 
@@ -20,6 +22,3 @@ app.listen(process.env.PORT, (err) => {
     console.log(`Listening at http://localhost:${process.env.PORT}`);
   }
 });
-
-// TEST TEST
-// loader.ETL();
