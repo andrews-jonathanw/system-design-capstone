@@ -10,8 +10,6 @@ app.use(express.json());
 app.use(bodyParser.json());
 
 app.use('/products', productRouter);
-// app.use('/qa', qaRouter);
-// app.use('/reviews', reviewsRouter);
 
 app.use('/qa', qaRouter);
 
