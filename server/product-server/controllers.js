@@ -3,15 +3,16 @@ const db = require('../db');
 
 const productRouter = express.Router();
 
-productRouter.get('/', (req, res) => {
+productRouter.get('/', async (req, res) => {
   // add functionality to account for headers on count and page
   db.query(`SELECT * FROM product WHERE ...`);
   // respond w data - transformed to how front end needs it
 });
 
-productRouter.get('/:product_id', (req, res) => {
+productRouter.get('/:product_id', async (req, res) => {
   // return product w specific id
-  db.query(`SELECT * FROM product WHERE product_id = ${req.params.product_id}`);
+  const query = await db.query(`SELECT * FROM product WHERE id = ${req.params.product_id}`);
+  res.send(query.rows[0]);
   // respond w data - transformed to how front end needs it
 });
 
