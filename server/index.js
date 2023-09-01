@@ -4,7 +4,6 @@ const path = require('path');
 const axios = require('axios');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const loader = require('./product-server/db/pgETL');
 const app = express();
 
 const productRouter = require('./product-server/controllers');
@@ -27,6 +26,3 @@ app.listen(process.env.PORT, (err) => {
     console.log(`Listening at http://localhost:${process.env.PORT}`);
   }
 });
-
-// TEST TEST
-// loader.ETL();
