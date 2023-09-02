@@ -38,7 +38,7 @@ qaRouter.get('/questions/:product_id', async (req, res) => {
     FROM answer_photos
     GROUP BY id_answer
   ) AS subquery ON subquery.id_answer = answer.id
-  WHERE question.product_id = ${req.params.product_id} AND question.reported = ${false}
+  WHERE question.product_id = ${req.params.product_id} AND question.reported = ${false} AND answer.reported = ${false}
   GROUP BY question.id`);
   console.log(query.rows)
 
