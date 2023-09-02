@@ -111,5 +111,21 @@ qaRouter.post('/questions', async (req, res) => {
   res.status(201).json({ message: 'Question inserted successfully'});
 });
 
+qaRouter.post('/questions/:question_id/answers', async (req, res) => {
+  // add functionality to account for headers on count and page
+  const { question_id, body, name, email } = req.query;
+
+  const query = `
+  INSERT INTO answer (
+    id_question, body, date_written, answerer_name, answerer_email, reported, helpful
+  ) VALUES ($1, $2, NOW()::timestamp(0), $3, $4, $5, $6)`;
+
+  const values = [question_id, body, name, email, false, 0]
+
+  const result = await db.query(query, values);
+
+  res.status(201).json({ message: 'Answer inserted successfully'});
+});
+
 
 module.exports = qaRouter;
