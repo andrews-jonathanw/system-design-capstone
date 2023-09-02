@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
+import DataObject from './DataObj.js';
 
 const LocalDataViewer = () => {
   const [data, setData] = useState(['dummy']);
@@ -10,7 +11,7 @@ const LocalDataViewer = () => {
 
 
   const fetchData = () => {
-    axios.get(`http://localhost:${process.env.REACT_APP_PORT}/test`)
+    axios.get(`http://localhost:3000/qa/questions/131244/answers`)
       .then((res)=> {
         // console.log('successy boiiii', res.data);
         setData(res.data);
@@ -19,12 +20,22 @@ const LocalDataViewer = () => {
         console.log(err);
       })
   }
+  const dataArr = data.results;
+  if (data.results === undefined) {
+    return (
+      <>Loading...</>
+    );
+  } else {
     return (
       <div>
-        <p>local data stuffs</p>
-        {console.log(data[0])}
+        <p>data stuffs</p>
+        {dataArr.map((data, index) => {
+          return <DataObject key={index} obj={data}/>
+        })}
       </div>
     );
+  }
+
 }
 
 export default LocalDataViewer;
