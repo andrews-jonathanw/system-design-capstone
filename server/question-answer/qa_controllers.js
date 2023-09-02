@@ -144,4 +144,55 @@ qaRouter.put('/questions/:question_id/helpful', async (req, res) => {
   res.status(204).send();
 });
 
+qaRouter.put('/questions/:question_id/report', async (req, res) => {
+  // add functionality to account for headers on count and page
+  const { question_id } = req.params;
+
+  const query = `
+  UPDATE question
+  SET reported = true
+  WHERE question.id = $1;
+  `;
+
+  const values = [question_id]
+
+  const result = await db.query(query, values);
+
+  res.status(204).send();
+});
+
+qaRouter.put('/answers/:answer_id/helpful', async (req, res) => {
+  // add functionality to account for headers on count and page
+  const { answer_id } = req.params;
+
+  const query = `
+  UPDATE answer
+  SET helpful = helpful + 1
+  WHERE answer.id = $1;
+  `;
+
+  const values = [answer_id]
+
+  const result = await db.query(query, values);
+
+  res.status(204).send();
+});
+
+qaRouter.put('/answers/:answer_id/report', async (req, res) => {
+  // add functionality to account for headers on count and page
+  const { answer_id } = req.params;
+
+  const query = `
+  UPDATE answer
+  SET reported = true
+  WHERE answer.id = $1;
+  `;
+
+  const values = [answer_id]
+
+  const result = await db.query(query, values);
+
+  res.status(204).send();
+});
+
 module.exports = qaRouter;
