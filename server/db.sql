@@ -298,6 +298,20 @@ alter table question alter column date_written type timestamp using TIMEZONE('UT
 alter table answer alter column date_written type timestamp using TIMEZONE('UTC', TO_TIMESTAMP(date_written / 1000 ));
 alter table reviews alter column date type timestamp using TIMEZONE('UTC', TO_TIMESTAMP(date / 1000 ));
 
+DO $$
+BEGIN
+  EXECUTE 'ALTER SEQUENCE ' || pg_get_serial_sequence('question', 'id') ||
+    ' RESTART WITH ' || (SELECT MAX(id) + 1 FROM question);
+END $$;
+
+DO $$
+BEGIN
+  EXECUTE 'ALTER SEQUENCE ' || pg_get_serial_sequence('answer', 'id') ||
+    ' RESTART WITH ' || (SELECT MAX(id) + 1 FROM answer);
+END $$;
+
+
+
 -- Table Properties
 -- ---
 

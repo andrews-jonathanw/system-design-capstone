@@ -27,4 +27,6 @@ const DataObject = ({obj}) => {
   );
 }
 
+
+
 export default DataObject;
