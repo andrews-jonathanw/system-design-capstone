@@ -1,11 +1,5 @@
 const express = require('express');
 const db = require('../db');
-const { Sequelize } = require('sequelize');
-
-// const sequelize = new Sequelize(process.env.PGDB_NAME, process.env.PGUSER, '', {
-//   host: 'localhost',
-//   dialect: 'postgres'
-// });
 
 const productRouter = express.Router();
 
@@ -34,12 +28,16 @@ productRouter.get('/:product_id', async (req, res) => {
 });
 
 productRouter.get('/:product_id/styles', async (req, res) => {
-  // return all styles from id
+  // will return all styles from id some day
   const query = await db.query(`
   SELECT
-    styles.id, styles.name, styles.original_price, styles.sale_price, styles.default_style,
-    ARRAY_AGG(
-      JSON_BUILD_OBJECT(
+    styles.id AS style_id,
+    styles.name AS name,
+    styles.original_price AS original_price
+    styles.sale_price AS sale_price,
+    styles.default_style AS 'default?',
+    ARRAY_AGG(DISTINCT
+      JSONB_BUILD_OBJECT(
         'thumbnail_url', photos.thumbnail_url,
         'url', photos.url
       )
@@ -51,10 +49,10 @@ productRouter.get('/:product_id/styles', async (req, res) => {
       )
     ) AS skus
   FROM
-  styles
-  LEFT JOIN
+    styles
+  INNER JOIN
     photos ON photos.style_id = styles.id
-  LEFT JOIN
+  INNER JOIN
     skus ON skus.style_id = styles.id
   WHERE
     styles.product_id = ${req.params.product_id}
@@ -65,3 +63,41 @@ productRouter.get('/:product_id/styles', async (req, res) => {
 });
 
 module.exports = productRouter;
+
+/*
+  SELECT
+  product.id AS product_id,
+    (SELECT
+      styles.id AS style_id,
+      styles.name AS name,
+      styles.original_price AS original_price
+      styles.sale_price AS sale_price,
+      styles.default_style AS 'default?',
+      ARRAY_AGG(DISTINCT
+        JSONB_BUILD_OBJECT(
+          'thumbnail_url', photos.thumbnail_url,
+          'url', photos.url
+        )
+      ) AS photos,
+      JSON_OBJECT_AGG(
+        skus.id, JSON_BUILD_OBJECT(
+          'quantity', skus.quantity,
+          'size', skus.size
+        )
+      ) AS skus
+      FROM
+        styles
+      INNER JOIN
+        photos ON photos.style_id = styles.id
+      INNER JOIN
+        skus ON skus.style_id = styles.id
+      WHERE
+        styles.product_id = ${req.params.product_id}
+      GROUP BY
+        styles.id
+    ) AS results
+  FROM
+    product
+  WHERE
+    product.id = ${req.params.product_id}
+*/
