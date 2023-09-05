@@ -58,7 +58,9 @@ qaRouter.get('/questions/:product_id', async (req, res) => {
 
 
 qaRouter.get('/questions/:question_id/answers', async (req, res) => {
-  // add functionality to account for headers on count and page
+  const count = req.query.count || 5;
+  const page = req.query.page || 1;
+  const offset = (page - 1) * count;
   const query = await db.query(`
   SELECT
   JSON_AGG(
@@ -80,9 +82,8 @@ qaRouter.get('/questions/:question_id/answers', async (req, res) => {
     FROM answer_photos
     GROUP BY id_answer
   ) AS subquery ON subquery.id_answer = answer.id
-
-
-  WHERE answer.id_question = ${req.params.question_id} AND answer.reported = 'false'`);
+  WHERE answer.id_question = ${req.params.question_id} AND answer.reported = 'false'
+  LIMIT ${count} OFFSET ${offset}`);
 
   const result = {
     question: `${req.params.question_id}`,

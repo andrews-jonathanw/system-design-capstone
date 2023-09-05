@@ -52,4 +52,34 @@ describe('GET /questions/:product_id', () => {
         done();
       });
   });
+
+  it('should return a 200 status code and valid JSON response for answers to a question', (done) => {
+    const questionId = 131244;
+
+    request(server)
+      .get(`/questions/${questionId}/answers`)
+      .expect(200)
+      .expect('Content-Type', /json/)
+      .end((err, res) => {
+        if (err) return done(err);
+
+
+        expect(res.body).to.be.an('object');
+        expect(res.body).to.have.property('question').to.equal(`${questionId}`);
+        expect(res.body).to.have.property('results').to.be.an('array');
+
+
+        const results = res.body.results;
+        expect(results).to.have.lengthOf.at.least(1);
+        expect(results[0]).to.have.property('answerid').to.be.a('number');
+        expect(results[0]).to.have.property('body').to.be.a('string');
+        expect(results[0]).to.have.property('date').to.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/);
+        expect(results[0]).to.have.property('answerer_name').to.be.a('string');
+        expect(results[0]).to.have.property('helpfulness').to.be.a('number');
+        expect(results[0]).to.have.property('reported').to.be.a('boolean');
+        expect(results[0]).to.have.property('photos').to.be.an('null');
+
+        done();
+      });
+  });
 });
