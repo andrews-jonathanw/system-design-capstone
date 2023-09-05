@@ -8,11 +8,9 @@ const LocalDataViewer = () => {
     fetchData();
   },[])
 
-
+  console.log('successy boiiii', process.env.REACT_APP_PORT);
   const fetchData = () => {
-    axios.get(`http://localhost:${process.env.REACT_APP_PORT}/test`)
-      .then((res)=> {
-        // console.log('successy boiiii', res.data);
+    axios.get(`http://localhost:${process.env.REACT_APP_PORT}/reviews/`).then((res) => {
         setData(res.data);
       })
       .catch(err => {
@@ -21,8 +19,11 @@ const LocalDataViewer = () => {
   }
     return (
       <div>
-        <p>local data stuffs</p>
-        {console.log(data[0])}
+        {console.log(data)}
+        {/* { data.map((single) => {
+          console.log(data)
+          // return <p>{data}</p>
+        })} */}
       </div>
     );
 }
