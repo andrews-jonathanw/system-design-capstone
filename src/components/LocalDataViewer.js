@@ -11,7 +11,7 @@ const LocalDataViewer = () => {
 
 
   const fetchData = () => {
-    axios.get(`http://localhost:3000/qa/questions/131244/answers`)
+    axios.get(`http://localhost:3000/qa/questions/?product_id=37323`)
       .then((res)=> {
         // console.log('successy boiiii', res.data);
         setData(res.data);

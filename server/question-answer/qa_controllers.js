@@ -4,7 +4,8 @@ const db = require('../db');
 
 const qaRouter = express.Router();
 
-qaRouter.get('/questions/:product_id', async (req, res) => {
+qaRouter.get('/questions/', async (req, res) => {
+  console.log('inside get query');
   // add functionality to account for headers on count and page
   const count = req.query.count || 5;
   const page = req.query.page || 1;
@@ -41,12 +42,12 @@ qaRouter.get('/questions/:product_id', async (req, res) => {
     FROM answer_photos
     GROUP BY id_answer
   ) AS subquery ON subquery.id_answer = answer.id
-  WHERE question.product_id = ${req.params.product_id} AND question.reported = 'false' AND answer.reported = 'false'
+  WHERE question.product_id = ${req.query.product_id} AND question.reported = 'false' AND answer.reported = 'false'
   GROUP BY question.id
   ORDER BY question.id
   LIMIT ${count} OFFSET ${offset}`);
   const result = {
-    product_id: `${req.params.product_id}`,
+    product_id: `${req.query.product_id}`,
     results: []
   }
   query.rows.forEach((question) => {
