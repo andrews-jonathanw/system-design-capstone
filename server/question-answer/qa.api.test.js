@@ -29,7 +29,7 @@ describe('GET /questions/:product_id', () => {
     const productId = 37323;
 
     request(app)
-      .get(`/questions/${productId}`)
+      .get(`/questions/?product_id=${productId}`)
       .expect(200)
       .expect('Content-Type', /json/)
       .end((err, res) => {
@@ -42,7 +42,7 @@ describe('GET /questions/:product_id', () => {
     const productId = 37323;
 
     request(app)
-      .get(`/questions/${productId}`)
+      .get(`/questions/?product_id=${productId}`)
       .expect(200)
       .end((err, res) => {
         if (err) return done(err);

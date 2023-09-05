@@ -310,6 +310,15 @@ BEGIN
     ' RESTART WITH ' || (SELECT MAX(id) + 1 FROM answer);
 END $$;
 
+-- Indexing for QA Section
+CREATE INDEX idx_question_product_id ON question (product_id);
+CREATE INDEX idx_question_reported ON question (reported);
+
+CREATE INDEX idx_answer_id_question ON answer (id_question);
+CREATE INDEX idx_answer_reported ON answer (reported);
+
+CREATE INDEX idx_answer_photos_id_answer ON answer_photos (id_answer);
+
 
 
 -- Table Properties
