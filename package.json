@@ -26,7 +26,8 @@
     "server-dev": "nodemon server/index.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "mocha server/question-answer/qa.api.test.js",
+    "test-qa": "mocha server/question-answer/qa.api.test.js",
+    "test-product": "mocha server/product-server/product.api.test.js",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

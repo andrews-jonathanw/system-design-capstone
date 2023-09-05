@@ -28,7 +28,7 @@ describe('GET /products', () => {
 
   it('should return a 200 status code and valid JSON response', (done) => {
     request(app)
-      .get(`/products`)
+      .get(`/`)
       .expect(200)
       .expect('Content-Type', /json/)
       .end((err, res) => {
@@ -41,7 +41,7 @@ describe('GET /products', () => {
     const productId = 10000;
 
     request(app)
-      .get(`/products/${productId}`)
+      .get(`/${productId}`)
       .expect(200)
       .end((err, res) => {
         if (err) return done(err);
@@ -61,7 +61,7 @@ describe('GET /products', () => {
     const productId = 1;
 
     request(server)
-      .get(`/products/${productId}/styles`)
+      .get(`/${productId}/styles`)
       .expect(200)
       .expect('Content-Type', /json/)
       .end((err, res) => {
@@ -80,7 +80,7 @@ describe('GET /products', () => {
         expect(results[0]).to.have.property('name').to.be.a('string');
         expect(results[0]).to.have.property('default?').to.be.a('boolean');
         expect(results[0]).to.have.property('photos').to.be.an('array');
-        expect(results[0]).to.have.property('photos').to.be.an('skus');
+        expect(results[0]).to.have.property('skus');
         done();
       });
   });
