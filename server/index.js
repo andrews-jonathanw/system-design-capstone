@@ -3,8 +3,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
-
 const productRouter = require('./product-server/controllers');
+const qaRouter = require('./question-answer/qa_controllers');
+app.use(cors());
 // const qaRouter = require('./qa-server/controllers');
 const reviewsRouter = require('./reviews-server/controllers');
 
@@ -17,10 +18,7 @@ app.use('/products', productRouter);
 // app.use('/qa', qaRouter);
 app.use('/reviews', reviewsRouter);
 
-app.get('/test',(req, res) => {
-
-});
-
+app.use('/qa', qaRouter);
 
 app.listen(process.env.PORT, (err) => {
   if (err) {
