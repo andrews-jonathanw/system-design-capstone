@@ -1,18 +1,19 @@
 const express = require('express');
 const db = require('../db');
-const { Sequelize } = require('sequelize');
-
-// const sequelize = new Sequelize(process.env.PGDB_NAME, process.env.PGUSER, '', {
-//   host: 'localhost',
-//   dialect: 'postgres'
-// });
 
 const productRouter = express.Router();
 
 productRouter.get('/', async (req, res) => {
   const count = req.query.count || 5;
   const page = req.query.page || 1;
-  const query = await db.query(`SELECT * FROM product WHERE product.id >= ${(count * page) - count + 1} AND product.id <= ${page * count}`);
+  const query = await db.query(`
+    SELECT
+      *
+    FROM
+      product
+    WHERE
+      product.id >= ${(count * page) - count + 1} AND product.id <= ${page * count}
+  `);
   res.send(query.rows);
 });
 
@@ -23,7 +24,7 @@ productRouter.get('/:product_id', async (req, res) => {
     ARRAY_AGG(JSON_BUILD_OBJECT('Feature', features.feature, 'Value', features.value)) AS features
   FROM
     product
-  LEFT JOIN
+  INNER JOIN
     features ON features.product_id = product.id
   WHERE
     product.id = ${req.params.product_id}
@@ -34,12 +35,15 @@ productRouter.get('/:product_id', async (req, res) => {
 });
 
 productRouter.get('/:product_id/styles', async (req, res) => {
-  // return all styles from id
   const query = await db.query(`
   SELECT
-    styles.id, styles.name, styles.original_price, styles.sale_price, styles.default_style,
-    ARRAY_AGG(
-      JSON_BUILD_OBJECT(
+    styles.id AS style_id,
+    styles.name AS name,
+    styles.original_price AS original_price,
+    styles.sale_price AS sale_price,
+    styles.default_style AS "default?",
+    ARRAY_AGG(DISTINCT
+      JSONB_BUILD_OBJECT(
         'thumbnail_url', photos.thumbnail_url,
         'url', photos.url
       )
@@ -52,16 +56,24 @@ productRouter.get('/:product_id/styles', async (req, res) => {
     ) AS skus
   FROM
   styles
-  LEFT JOIN
+  INNER JOIN
     photos ON photos.style_id = styles.id
-  LEFT JOIN
+  INNER JOIN
     skus ON skus.style_id = styles.id
   WHERE
     styles.product_id = ${req.params.product_id}
   GROUP BY
     styles.id
   `);
-  res.send(query.rows);
+  let response = {
+    product_id: `${req.params.product_id}`,
+    results: query.rows
+  }
+  response.results.forEach(style => {
+    style['default?'] = (style['default?'] === '1' ? true : false);
+    style['sale_price'] = (style['sale_price'] === 'null' ? null : Number(style['sale_price']));
+  })
+  res.send(response);
 });
 
 module.exports = productRouter;
