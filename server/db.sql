@@ -59,7 +59,7 @@
 DROP TABLE IF EXISTS reviews CASCADE;
 
 CREATE TABLE reviews (
-  id SERIAL,
+  review_id SERIAL,
   product_id INTEGER NOT NULL,
   rating INTEGER NOT NULL,
   date BIGINT NOT NULL,
@@ -68,10 +68,10 @@ CREATE TABLE reviews (
   recommend BOOLEAN NOT NULL,
   reported BOOLEAN NOT NULL,
   reviewer_name TEXT NOT NULL,
-  reviwer_email TEXT NOT NULL,
+  reviewer_email TEXT NOT NULL,
   response TEXT NOT NULL,
-  helfulness INTEGER NOT NULL,
-  PRIMARY KEY (id)
+  helpfulness INTEGER NOT NULL,
+  PRIMARY KEY (review_id)
 );
 
 -- ---
@@ -265,13 +265,13 @@ ALTER TABLE answer ADD FOREIGN KEY (id_question) REFERENCES question (id);
 ALTER TABLE archived_answers ADD FOREIGN KEY (id_answer) REFERENCES answer (id);
 ALTER TABLE archived_questions ADD FOREIGN KEY (id_question) REFERENCES question (id);
 ALTER TABLE answer_photos ADD FOREIGN KEY (id_answer) REFERENCES answer (id);
-ALTER TABLE review_photos ADD FOREIGN KEY (id_reviews) REFERENCES reviews (id);
+ALTER TABLE review_photos ADD FOREIGN KEY (id_reviews) REFERENCES reviews (review_id);
 ALTER TABLE reviews_meta_data ADD FOREIGN KEY (product_id) REFERENCES product (id);
 ALTER TABLE ratings ADD FOREIGN KEY (id_reviews_meta_data) REFERENCES reviews_meta_data (id);
 ALTER TABLE recommended_meta ADD FOREIGN KEY (id_reviews_meta_data) REFERENCES reviews_meta_data (id);
 ALTER TABLE characteristics ADD FOREIGN KEY (product_id) REFERENCES product (id);
 ALTER TABLE characteristic_rating ADD FOREIGN KEY (id_characteristics) REFERENCES characteristics (id);
-ALTER TABLE characteristic_rating ADD FOREIGN KEY (id_reviews) REFERENCES reviews (id);
+ALTER TABLE characteristic_rating ADD FOREIGN KEY (id_reviews) REFERENCES reviews (review_id);
 ALTER TABLE features ADD FOREIGN KEY (product_id) REFERENCES product (id);
 ALTER TABLE styles ADD FOREIGN KEY (product_id) REFERENCES product (id);
 ALTER TABLE photos ADD FOREIGN KEY (style_id) REFERENCES styles (id);
@@ -303,14 +303,31 @@ BEGIN
   EXECUTE 'ALTER SEQUENCE ' || pg_get_serial_sequence('question', 'id') ||
     ' RESTART WITH ' || (SELECT MAX(id) + 1 FROM question);
 END $$;
-
 DO $$
 BEGIN
   EXECUTE 'ALTER SEQUENCE ' || pg_get_serial_sequence('answer', 'id') ||
     ' RESTART WITH ' || (SELECT MAX(id) + 1 FROM answer);
 END $$;
+DO $$
+BEGIN
+  EXECUTE 'ALTER SEQUENCE ' || pg_get_serial_sequence('reviews', 'review_id') ||
+    ' RESTART WITH ' || (SELECT MAX(review_id) + 1 FROM reviews);
+END $$;
+DO $$
+BEGIN
+  EXECUTE 'ALTER SEQUENCE ' || pg_get_serial_sequence('characteristic_rating', 'id') ||
+    ' RESTART WITH ' || (SELECT MAX(id) + 1 FROM characteristic_rating);
+END $$;
+DO $$
+BEGIN
+  EXECUTE 'ALTER SEQUENCE ' || pg_get_serial_sequence('review_photos', 'id') ||
+    ' RESTART WITH ' || (SELECT MAX(id) + 1 FROM review_photos);
+END $$;
 
-
+CREATE INDEX idx_characteristics_product_id ON characteristics (product_id);
+CREATE INDEX idx_reviews_product_id ON reviews (product_id);
+CREATE INDEX idx_reviews_reported ON reviews (reported);
+CREATE INDEX idx_charateristic_rating_id ON characteristic_rating (id_characteristics);
 
 -- Table Properties
 -- ---

@@ -6,6 +6,7 @@ const db = new Pool({
   host: process.env.PGHOST,
   database: process.env.PGDB_NAME,
   port: process.env.PGPORT,
+  password: process.env.PGPASSWORD
 });
 
 module.exports = db;
