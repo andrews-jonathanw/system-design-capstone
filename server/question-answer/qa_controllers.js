@@ -4,57 +4,68 @@ const db = require('../db');
 
 const qaRouter = express.Router();
 
-qaRouter.get('/questions/:product_id', async (req, res) => {
-  // add functionality to account for headers on count and page
+qaRouter.get('/questions/', async (req, res) => {
+  console.log('inside get query');
+  // Add functionality to account for headers on count and page
   const count = req.query.count || 5;
   const page = req.query.page || 1;
   const offset = (page - 1) * count;
-  const query = await db.query(`
-  SELECT
-  JSON_BUILD_OBJECT(
-    'question_id', question.id,
-    'question_body', question.body,
-    'asker_name', question.asker_name,
-    'question_helpfulness', question.helpful,
-    'question_date', question.date_written,
-    'reported', question.reported,
-    'answers',
-    JSON_OBJECT_AGG(
-      answer.id,
-      JSON_BUILD_OBJECT(
-        'answerid', answer.id,
-        'body', answer.body,
-        'date', answer.date_written,
-        'answerer_name', answer.answerer_name,
-        'helpfulness', answer.helpful,
-        'reported', answer.reported,
-        'photos', answer_photos
-      )
-    )
-  ) AS question_and_answers
-  FROM question
-  JOIN answer ON answer.id_question = question.id
-  LEFT JOIN (
-    SELECT
-      id_answer,
-      ARRAY_AGG(url) AS answer_photos
-    FROM answer_photos
-    GROUP BY id_answer
-  ) AS subquery ON subquery.id_answer = answer.id
-  WHERE question.product_id = ${req.params.product_id} AND question.reported = 'false' AND answer.reported = 'false'
-  GROUP BY question.id
-  ORDER BY question.id
-  LIMIT ${count} OFFSET ${offset}`);
-  const result = {
-    product_id: `${req.params.product_id}`,
-    results: []
-  }
-  query.rows.forEach((question) => {
-    result.results.push(question.question_and_answers);
-  });
 
-  res.send(result);
+  // Define the SQL query as a prepared statement with placeholders
+  const queryText = `
+    SELECT
+    JSON_BUILD_OBJECT(
+      'question_id', question.id,
+      'question_body', question.body,
+      'asker_name', question.asker_name,
+      'question_helpfulness', question.helpful,
+      'question_date', question.date_written,
+      'reported', question.reported,
+      'answers',
+      JSON_OBJECT_AGG(
+        answer.id,
+        JSON_BUILD_OBJECT(
+          'id', answer.id,
+          'body', answer.body,
+          'date', answer.date_written,
+          'answerer_name', answer.answerer_name,
+          'helpfulness', answer.helpful,
+          'reported', answer.reported,
+          'photos', COALESCE(answer_photos, '[]'::json)
+        )
+      )
+    ) AS question_and_answers
+    FROM question
+    JOIN answer ON answer.id_question = question.id
+    LEFT JOIN (
+      SELECT
+        id_answer,
+        COALESCE(json_agg(url), '[]'::json) AS answer_photos
+      FROM answer_photos
+      GROUP BY id_answer
+    ) AS subquery ON subquery.id_answer = answer.id
+    WHERE question.product_id = $1 AND question.reported = 'false' AND answer.reported = 'false'
+    GROUP BY question.id
+    ORDER BY question.id
+    LIMIT $2 OFFSET $3`;
+
+  const queryValues = [req.query.product_id, count, offset];
+
+  try {
+    const queryResult = await db.query(queryText, queryValues);
+
+    const result = {
+      product_id: `${req.query.product_id}`,
+      results: queryResult.rows.map((question) => question.question_and_answers),
+    };
+
+    res.send(result);
+  } catch (error) {
+    console.error('Error executing SQL query:', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
+
 
 
 qaRouter.get('/questions/:question_id/answers', async (req, res) => {
@@ -65,7 +76,7 @@ qaRouter.get('/questions/:question_id/answers', async (req, res) => {
   SELECT
   JSON_AGG(
     JSON_BUILD_OBJECT(
-      'answerid', answer.id,
+      'id', answer.id,
       'body', answer.body,
       'date', answer.date_written,
       'answerer_name', answer.answerer_name,
