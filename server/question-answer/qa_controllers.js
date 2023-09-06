@@ -25,7 +25,7 @@ qaRouter.get('/questions/', async (req, res) => {
       JSON_OBJECT_AGG(
         answer.id,
         JSON_BUILD_OBJECT(
-          'answerid', answer.id,
+          'id', answer.id,
           'body', answer.body,
           'date', answer.date_written,
           'answerer_name', answer.answerer_name,
@@ -76,7 +76,7 @@ qaRouter.get('/questions/:question_id/answers', async (req, res) => {
   SELECT
   JSON_AGG(
     JSON_BUILD_OBJECT(
-      'answerid', answer.id,
+      'id', answer.id,
       'body', answer.body,
       'date', answer.date_written,
       'answerer_name', answer.answerer_name,
