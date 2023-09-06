@@ -42,7 +42,7 @@ productRouter.get('/:product_id/styles', async (req, res) => {
     styles.original_price AS original_price,
     styles.sale_price AS sale_price,
     styles.default_style AS "default?",
-    ARRAY_AGG(DISTINCT
+    JSON_AGG(DISTINCT
       JSONB_BUILD_OBJECT(
         'thumbnail_url', photos.thumbnail_url,
         'url', photos.url
