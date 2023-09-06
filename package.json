@@ -12,6 +12,7 @@
     "csv-parser": "^3.0.0",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "mocha": "^10.2.0",
     "path": "^0.12.7",
     "pg": "^8.11.3",
     "pg-hstore": "^2.3.4",
@@ -25,7 +26,8 @@
     "server-dev": "nodemon server/index.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "mocha server/question-answer/qa.api.test.js",
+    "test-qa": "mocha server/question-answer/qa.api.test.js",
+    "test-product": "mocha server/product-server/product.api.test.js",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
