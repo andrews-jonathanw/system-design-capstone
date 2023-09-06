@@ -31,7 +31,7 @@ qaRouter.get('/questions/', async (req, res) => {
           'answerer_name', answer.answerer_name,
           'helpfulness', answer.helpful,
           'reported', answer.reported,
-          'photos', answer_photos
+          'photos', COALESCE(answer_photos, '[]'::json)
         )
       )
     ) AS question_and_answers
@@ -40,7 +40,7 @@ qaRouter.get('/questions/', async (req, res) => {
     LEFT JOIN (
       SELECT
         id_answer,
-        ARRAY_AGG(url) AS answer_photos
+        COALESCE(json_agg(url), '[]'::json) AS answer_photos
       FROM answer_photos
       GROUP BY id_answer
     ) AS subquery ON subquery.id_answer = answer.id
